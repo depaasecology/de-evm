@@ -1,0 +1,275 @@
+# DE CLI
+
+`de` is the all-in-one command-line interface (CLI). It allows you to run an Evmos node, manage wallets and interact with the Evmos network through queries and transactions. This introduction will explain how to install the `DE EVM` binary onto your system and guide you through some simple examples how to use evmosd.
+
+## Prerequisites[](https://docs.evmos.org/protocol/evmos-cli#prerequisites)
+
+#### Go[](https://docs.evmos.org/protocol/evmos-cli#go)
+
+Evmos is built using [Go](https://golang.org/dl/) version `1.20+`. Check your version with:
+
+```bash
+go version
+```
+
+
+
+Once you have installed the right version, confirm that your [`GOPATH`](https://golang.org/doc/gopath_code#GOPATH) is correctly configured by running the following command and adding it to your shell startup script:
+
+```bash
+export PATH=$PATH:$(go env GOPATH)/bin
+```
+
+
+
+#### jq[](https://docs.evmos.org/protocol/evmos-cli#jq)
+
+Evmos scripts are using [jq](https://stedolan.github.io/jq/download/) version `1.6+`. Check your version with:
+
+```text
+jq --version
+```
+
+
+
+## Installation[](https://docs.evmos.org/protocol/evmos-cli#installation)
+
+You can download the latest binaries from the repo and install them, or you can build and install the `evmosd` binaries from source or using Docker.
+
+### Download the binaries
+
+- Go to the [releases section of the repository](https://github.com/depaasecology/de-evm)
+- Choose the desired release or pre-release you want to install on your machine
+- Select and download from the `Assets` dropdown the corresponding tar or zip file for your OS
+- Extract the files. The `evmosd` binaries is located in the `bin` directory of the extrated files
+- Add the `evmosd` binaries to your path, e.g. you can move it to `$(go env GOPATH)/bin`
+
+After installation is done, check that the `evmosd` binaries have been successfully installed:
+
+```bash
+evmosd version
+```
+
+
+
+### Build From Source[](https://docs.evmos.org/protocol/evmos-cli#build-from-source)
+
+Clone and build the Evmos from source using `git`. The `<tag>` refers to a release tag on Github. Check the latest Evmos version on the [releases section of the repository](https://github.com/depaasecology/de-evm):
+
+```bash
+git clone https://github.com/depaasecology/de-evm.git
+cd evmos
+git fetch
+git checkout <tag>
+make install
+```
+
+
+
+After installation is done, check that the evmosd binaries have been successfully installed:
+
+```bash
+evmosd version
+```
+
+
+
+INFO
+
+If the `evmosd: command not found` error message is returned, confirm that you have configured Go correctly.
+
+### Docker[](//docs/cli/docker-build.md)
+
+When it comes to using Docker with Evmos, there are two options available: Build a binary of the Evmos daemon inside a dockerized build environment or build a Docker image, that can be used to spin up individual containers running the Evmos binary. For information on how to achieve this, proceed to the dedicated page on [working with Docker](/docs/cli/docker-build.md).
+
+## Run an DE node[](https://docs.evmos.org/protocol/evmos-cli#run-an-evmos-node)
+
+To become familiar with Evmos, you can run a local blockchain node that produces blocks and exposes EVM and Cosmos endpoints. This allows you to deploy and interact with smart contracts locally or test core protocol functionality.
+
+Run the local node by executing the `local_node.sh` script in the base directory of the repository:
+
+```bash
+./local_node.sh
+```
+
+
+
+The script stores the node configuration including the local default endpoints under `~/.tmp-evmosd/config/config.toml`. If you have previously run the script, the script allows you to overwrite the existing configuration and start a new local node.
+
+Once your node is running you will see it validating and producing blocks in your local Evmos blockchain:
+
+```bash
+12:59PM INF executed block height=1 module=state num_invalid_txs=0 num_valid_txs=0 server=node
+# ...
+1:00PM INF indexed block exents height=7 module=txindex server=node
+```
+
+
+
+For more information on how to customize a local node, head over to the [Single Node](/docs/cli/single-node.md) page.
+
+## Using `evmosd`[](https://docs.evmos.org/protocol/evmos-cli#using-evmosd)
+
+After installing the `evmosd` binary, you can run commands using:
+
+```bash
+evmosd [command]
+```
+
+
+
+There is also a `-h`, `--help` command available
+
+```bash
+evmosd -h
+```
+
+
+
+It is possible to maintain multiple node configurations at the same time. To specify a configuration use the `--home` flag. In the following examples we will be using the default config for a local node, located at `~/.tmp-evmosd`.
+
+### Manage wallets[](https://docs.evmos.org/protocol/evmos-cli#manage-wallets)
+
+You can manage your wallets using the evmosd binary to store private keys and sign transactions over CLI. To view all keys use:
+
+```bash
+evmosd keys list \
+--home ~/.tmp-evmosd \
+--keyring-backend test
+
+# Example Output:
+# - address: evmos19xnmslvl0pcmydu4m52h2gf0std5ee5pfgpyuf
+#   name: dev0
+#   pubkey: '{"@type":"/ethermint.crypto.v1.ethsecp256k1.PubKey","key":"AzKouyoUL0UUS1qRUZdqyVsTPkCAFWwxx3+BTOw36nKp"}'
+#   type: local
+```
+
+
+
+You can generate a new key/mnemonic with a `$NAME` with:
+
+```bash
+evmosd keys add [name] \
+--home ~/.tmp-evmosd \
+--keyring-backend test
+```
+
+
+
+To export your evmos key as an Ethereum private key (for use with [Metamask](https://docs.evmos.org/use/connect-your-wallet/metamask) for example):
+
+```bash
+evmosd keys unsafe-export-eth-key [name] \
+--home ~/.tmp-evmosd \
+--keyring-backend test
+```
+
+
+
+For more about the available key commands, use the `--help` flag
+
+```bash
+evmosd keys -h
+```
+
+
+
+TIP
+
+For more information about the Keyring and its backend options, click [here](https://docs.evmos.org/protocol/concepts/keyring).
+
+### Interact with a Network[](https://docs.evmos.org/protocol/evmos-cli#interact-with-a-network)
+
+You can use evmosd to query information or submit transactions on the blockchain. Queries and transactions are requests that you send to an Evmos node through the Tendermint RPC.
+
+TIP
+
+👉 To use the CLI, you will need to provide a Tendermint RPC address for the `--node` flag. Look for a publicly available addresses for testnet and mainnet in the Networks page.
+
+#### Set Network Config[](https://docs.evmos.org/protocol/evmos-cli#set-network-config)
+
+In the local setup the node is set to `tcp://localhost:26657`. You can view your node configuration with:
+
+```bash
+evmosd config \
+--home ~/.tmp-evmosd
+# Example Output
+# {
+#   "chain-id": "evmos_9000-1",
+#   "keyring-backend": "test",
+#   "output": "text",
+#   "node": "tcp://localhost:26657",
+#   "broadcast-mode": "sync"
+# }
+```
+
+
+
+You can set your node configuration to send requests to a different network by changing the endpoint with:
+
+```bash
+evmosd config node [tendermint-rpc-endpoint] \
+--home ~/.tmp-evmosd
+```
+
+
+
+Learn about more node configurations [here](/docs//cli/configuration.md).
+
+#### Queries[](https://docs.evmos.org/protocol/evmos-cli#queries)
+
+You can query information on the blockchain using `evmosd query` (short `evmosd q`). To view the account balances by its address stored in the bank module, use:
+
+```bash
+evmosd q bank balances [adress] \
+--home ~/.tmp-evmosd
+# # Example Output:
+# balances:
+# - amount: "99999000000000000000002500"
+#   denom: aevmos
+```
+
+
+
+To view other available query commands, use:
+
+```bash
+# for all Queries
+evmosd q
+
+# for querying commands in the bank module
+evmosd q bank
+```
+
+
+
+#### Transactions[](https://docs.evmos.org/protocol/evmos-cli#transactions)
+
+You can submit transactions to the network using `evmosd tx`. This creates, signs and broadcasts a tx in one command. To send tokens from an account in the keyring to another address with the bank module, use:
+
+```bash
+evmosd tx bank send [from_key_or_address] [to_address] [amount] \
+--home ~/.tmp-evmosd \
+--fees 50000000000aevmos \
+-b block
+
+# Example Output:
+# ...
+# txhash: 7BA2618295B789CC24BB13E654D9187CDD264F61FC446EB756EAC07AF3E7C40A
+```
+
+
+
+To view other available transaction commands, use:
+
+```bash
+# for all transaction commands
+evmosd tx
+
+# for Bank transaction subcommands
+evmosd tx bank
+```
+
+
+
+Now that you've learned the basics of how to run and interact with an Evmos network, head over to [configurations](/docs/cli/configuration.md) for futher customization.
