@@ -4,7 +4,7 @@ To set up a full node, download the appropriate binary file based on the blockch
 
 - **Before block height 10,286,999**: Use the binary file from version 11.0.2-rc1.
     - Link: [v11.0.2-rc1](https://github.com/depaasecology/de-evm/releases/tag/v11.0.2-rc1)
-- **After block height 10,286,999**: Use the binary file from version 13.0.2.
+- **After block height 10,286,999**: You will need to compile the source code for version 13.0.2 to generate the required binary file.
     - Link: [v13.0.2](https://github.com/depaasecology/de-evm/releases/tag/v13.0.2)
 
 ## 2. Download the Genesis File
