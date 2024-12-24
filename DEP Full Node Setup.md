@@ -18,15 +18,44 @@ Download the genesis file required for initializing the blockchain:
 Run the following command to initialize the node. By default, it will create a directory in your home folder under `.evmosd`:
 
 ```bash
+bash
+复制代码
 evmosd init de --chain-id=demaster_9000-1
 
 ```
 
-## 4. Configure JSON-RPC Module
+## 4. Synchronize with a Snapshot
+
+After initializing the node, a `data` directory will be created in the specified home folder. To save time, use the snapshot method for synchronization:
+
+1. Download the snapshot file:
+    
+    ```bash
+    bash
+    复制代码
+    wget https://storage.googleapis.com/evmosd_node_bucket/full_node/dep_node_data.tgz
+    
+    ```
+    
+2. Extract the snapshot file into the `data` directory:
+    
+    ```bash
+    bash
+    复制代码
+    tar -xvzf dep_node_data.tgz -C ~/.evmosd/data/
+    
+    ```
+    
+    > Note: Ensure the snapshot is regularly updated to get the latest blockchain data.
+    > 
+
+## 5. Configure JSON-RPC Module
 
 Edit the `app.toml` file to enable and configure the JSON-RPC module:
 
 ```bash
+bash
+复制代码
 vim ~/.evmosd/config/app.toml
 
 ```
@@ -34,6 +63,8 @@ vim ~/.evmosd/config/app.toml
 Update the following section:
 
 ```toml
+toml
+复制代码
 [json-rpc]
 enable = true
 address = "0.0.0.0:8545"
@@ -45,7 +76,7 @@ api = "eth,txpool,net,debug,web3"
 - **8545**: Default RPC port for EVM; set IP to `0.0.0.0`.
 - **8546**: Default WS port for EVM; set IP to `0.0.0.0`.
 
-## 5. Configure Validator Seeds
+## 6. Configure Validator Seeds
 
 Retrieve the latest seed nodes from the following link:
 
@@ -54,6 +85,8 @@ Retrieve the latest seed nodes from the following link:
 Edit the `config.toml` file to add validator seed nodes:
 
 ```bash
+bash
+复制代码
 vim ~/.evmosd/config/config.toml
 
 ```
@@ -61,39 +94,45 @@ vim ~/.evmosd/config/config.toml
 Update the following line:
 
 ```toml
+toml
+复制代码
 seeds = "<SEED_NODES_FROM_FILE>"
 
 ```
 
 Replace `<SEED_NODES_FROM_FILE>` with the content of the downloaded `seeds.txt` file.
 
-## 6. Copy the Genesis File
+## 7. Copy the Genesis File
 
 Copy the downloaded genesis file into the `.evmosd` configuration folder:
 
 ```bash
+bash
+复制代码
 cp genesis.json ~/.evmosd/config/
 
 ```
 
-## 7. Run the Full Node
+## 8. Run the Full Node
 
 Start the full node using the following command:
 
 ```bash
+bash
+复制代码
 nohup evmosd start --pruning=nothing --log_level info --home ~/.evmosd >> evmos.log &
 
 ```
 
 ### Explanation:
 
-- `-pruning=nothing`: Retains all blockchain states without deletion.
+- `pruning=nothing`: Retains all blockchain states without deletion.
     - **Options:**
         - `everything`: Deletes all saved states except the current one.
         - `nothing`: Saves all states.
         - `default`: Saves the last 100 states and every 10,000th block state.
         - `custom`: Allows customized pruning using `pruning-keep-recent`, `pruning-keep-every`, and `pruning-interval` parameters.
-- `-home ~/.evmosd`: Specifies the home directory for `evmosd`. The default directory is used here.
+- `home ~/.evmosd`: Specifies the home directory for `evmosd`. The default directory is used here.
 - Logs will be written to `evmos.log`.
 
 ---
@@ -101,7 +140,12 @@ nohup evmosd start --pruning=nothing --log_level info --home ~/.evmosd >> evmos.
 ### Notes
 
 - Ensure the correct binary file is used based on the blockchain height.
+- Use the snapshot file for quicker synchronization.
 - Keep your `app.toml` and `config.toml` configurations updated for proper synchronization.
+
+### Snapshot Address
+
+- [Snapshot File](https://storage.googleapis.com/evmosd_node_bucket/full_node/dep_node_data.tgz)
 
 ### Binary File Links:
 
