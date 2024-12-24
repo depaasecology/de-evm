@@ -47,6 +47,15 @@ You can also check the instructions to [Run a Node](/docs/cli/README.md).
 Our documentation is hosted in a [separate repository](/docs/) and can be found at [depaas](http://depaas.de/#/index).
 Head over there and check it out.
 
+### Prerequisites
+
+Ensure you have the following dependencies installed before proceeding:
+
+- **Go**: Install Go version **1.20** or higher. Download it from [Go Downloads](https://go.dev/dl/).
+- **libusb**: Install the `libusb-1.0-0-dev` package. On Ubuntu or Debian-based systems, you can use the following command:
+  ```bash
+  sudo apt-get install libusb-1.0-0-dev
+  
 ## Installation
 
 For prerequisites and detailed build instructions
